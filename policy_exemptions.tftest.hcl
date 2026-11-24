@@ -1,5 +1,5 @@
 # Unit tests with a mock azurerm provider: no Azure access needed.
-# Run with `terraform test`. The deployment tests in deploy_test.go use the examples instead.
+# Run with `make test-unit`. The deployment tests in tests/deploy_test.go use the examples instead.
 
 
 mock_provider "azurerm" {}
