@@ -130,5 +130,5 @@ MIT Licensed. See [LICENSE](./LICENSE) for full details.
 ## References
 
 - [Documentation](https://learn.microsoft.com/azure/governance/policy/concepts/exemption-structure)
-- [Rest Api](https://learn.microsoft.com/rest/api/policy/policy-exemptions)
+- [Rest Api](https://learn.microsoft.com/en-us/rest/api/policy/)
 - [Rest Api Specs](https://github.com/Azure/azure-rest-api-specs/tree/main/specification/resources/resource-manager/Microsoft.Authorization/policy)
