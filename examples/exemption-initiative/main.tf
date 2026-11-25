@@ -45,10 +45,12 @@ module "policy" {
 
   policy_exemptions = {
     unmanaged-disks = {
+      scope_type                      = "resource_group"
       scope                           = module.rg.groups.demo.id
       policy_assignment_id            = azurerm_resource_group_policy_assignment.demo.id
       policy_definition_reference_ids = ["audit-unmanaged-disks"]
       exemption_category              = "Mitigated"
+      expires_on                      = "2099-12-31T23:59:59Z"
       description                     = "Only this initiative member is exempted; every other member keeps applying."
     }
   }

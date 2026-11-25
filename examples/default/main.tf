@@ -30,6 +30,7 @@ module "policy" {
 
   policy_exemptions = {
     demo = {
+      scope_type           = "resource_group"
       scope                = module.rg.groups.demo.id
       policy_assignment_id = azurerm_resource_group_policy_assignment.audit.id
       exemption_category   = "Waiver"

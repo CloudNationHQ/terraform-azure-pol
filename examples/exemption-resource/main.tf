@@ -35,9 +35,11 @@ module "policy" {
 
   policy_exemptions = {
     identity = {
+      scope_type           = "resource"
       scope                = azurerm_user_assigned_identity.demo.id
       policy_assignment_id = azurerm_resource_group_policy_assignment.audit.id
       exemption_category   = "Waiver"
+      expires_on           = "2099-12-31T23:59:59Z"
     }
   }
 }

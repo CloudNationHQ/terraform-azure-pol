@@ -23,9 +23,11 @@ module "policy" {
 
   policy_exemptions = {
     management-group = {
+      scope_type           = "management_group"
       scope                = azurerm_management_group.demo.id
       policy_assignment_id = azurerm_management_group_policy_assignment.audit.id
       exemption_category   = "Waiver"
+      expires_on           = "2099-12-31T23:59:59Z"
     }
   }
 }

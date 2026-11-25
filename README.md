@@ -6,11 +6,11 @@ This terraform module simplifies the creation and management of azure policy res
 
 Capability to exempt a management group, subscription, resource group or single resource from a policy assignment, from one map of exemptions.
 
-Detects the scope type from the scope ID and uses the matching azurerm exemption resource.
+Uses the matching azurerm exemption resource for the scope type set on each exemption, so scope IDs of resources created in the same deployment work.
 
 Supports exempting a whole assignment, or only specific initiative members through `policy_definition_reference_ids`.
 
-Includes support for categories, expiry dates, display names, descriptions and metadata as a map.
+Includes support for categories, required expiry dates, display names, descriptions and metadata as a map.
 
 Warns, without failing the plan, about exemptions that have expired or expire within 30 days.
 
@@ -29,7 +29,7 @@ The following requirements are needed by this module:
 
 The following providers are used by this module:
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (5.15.0)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 5.0)
 
 ## Resources
 
@@ -57,12 +57,13 @@ Type:
 ```hcl
 map(object({
     name                            = optional(string)
+    scope_type                      = string
     scope                           = string
     policy_assignment_id            = string
     exemption_category              = string
+    expires_on                      = string
     display_name                    = optional(string)
     description                     = optional(string)
-    expires_on                      = optional(string)
     policy_definition_reference_ids = optional(list(string))
     metadata                        = optional(map(string))
   }))
@@ -74,17 +75,9 @@ Default: `{}`
 
 The following outputs are exported:
 
-### <a name="output_policy_exemption_ids"></a> [policy\_exemption\_ids](#output\_policy\_exemption\_ids)
-
-Description: Contains the ID of each policy exemption, keyed by the caller key
-
 ### <a name="output_policy_exemptions"></a> [policy\_exemptions](#output\_policy\_exemptions)
 
 Description: Contains all policy exemptions, keyed by the caller key
-
-### <a name="output_policy_exemptions_summary"></a> [policy\_exemptions\_summary](#output\_policy\_exemptions\_summary)
-
-Description: Contains a summary of each policy exemption for compliance reporting, keyed by the caller key
 <!-- END_TF_DOCS -->
 
 ## Goals
@@ -97,9 +90,9 @@ For more information, please see our testing [guidelines](./TESTING.md)
 
 ## Notes
 
-Supported scope IDs: a management group, a subscription, a resource group, a resource in a resource group, and a resource directly under a subscription (for example `/subscriptions/x/providers/Microsoft.Security/pricings/VirtualMachines`). Resources directly under a management group are not supported.
+Supported `scope_type` values: `management_group`, `subscription`, `resource_group` and `resource`. A `resource` scope can be a resource in a resource group or a resource directly under a subscription (for example `/subscriptions/x/providers/Microsoft.Security/pricings/VirtualMachines`). Resources directly under a management group are not supported.
 
-Changing the scope of an exemption to a different scope type (for example from subscription to resource group) replaces the exemption, because each scope type is a different azurerm resource. Keep map keys stable to avoid other replacements.
+Changing the `scope_type` of an exemption (for example from subscription to resource group) replaces the exemption, because each scope type is a different azurerm resource. Keep map keys stable to avoid other replacements.
 
 Exemption names can be up to 64 characters at every scope. The 24-character limit at management group scope only applies to policy assignments.
 

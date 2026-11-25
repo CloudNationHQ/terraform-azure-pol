@@ -19,15 +19,19 @@ module "policy" {
 
   policy_exemptions = {
     subscription = {
+      scope_type           = "subscription"
       scope                = data.azurerm_subscription.current.id
       policy_assignment_id = azurerm_subscription_policy_assignment.audit.id
       exemption_category   = "Waiver"
+      expires_on           = "2099-12-31T23:59:59Z"
     }
     # a resource directly under the subscription, without a resource group
     defender-pricing = {
+      scope_type           = "resource"
       scope                = "${data.azurerm_subscription.current.id}/providers/Microsoft.Security/pricings/VirtualMachines"
       policy_assignment_id = azurerm_subscription_policy_assignment.audit.id
       exemption_category   = "Mitigated"
+      expires_on           = "2099-12-31T23:59:59Z"
     }
   }
 }

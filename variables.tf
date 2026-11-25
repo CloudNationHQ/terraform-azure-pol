@@ -2,12 +2,13 @@ variable "policy_exemptions" {
   description = "Contains all policy exemption configuration, keyed by a stable caller key"
   type = map(object({
     name                            = optional(string)
+    scope_type                      = string
     scope                           = string
     policy_assignment_id            = string
     exemption_category              = string
+    expires_on                      = string
     display_name                    = optional(string)
     description                     = optional(string)
-    expires_on                      = optional(string)
     policy_definition_reference_ids = optional(list(string))
     metadata                        = optional(map(string))
   }))
@@ -15,15 +16,25 @@ variable "policy_exemptions" {
 
   validation {
     condition = alltrue([
+      for k, v in var.policy_exemptions :
+      contains(["management_group", "subscription", "resource_group", "resource"], v.scope_type)
+    ])
+    error_message = "Each scope_type must be one of: management_group, subscription, resource_group, resource."
+  }
+
+  validation {
+    condition = alltrue([
       for k, v in var.policy_exemptions : (
-        can(regex("(?i)^/providers/Microsoft\\.Management/managementGroups/[^/]+$", v.scope)) ||
-        can(regex("(?i)^/subscriptions/[^/]+$", v.scope)) ||
-        can(regex("(?i)^/subscriptions/[^/]+/resourceGroups/[^/]+$", v.scope)) ||
-        can(regex("(?i)^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/[^/]+/.+[^/]$", v.scope)) ||
-        can(regex("(?i)^/subscriptions/[^/]+/providers/[^/]+/.+[^/]$", v.scope))
+        v.scope_type == "management_group" ? can(regex("(?i)^/providers/Microsoft\\.Management/managementGroups/[^/]+$", v.scope)) :
+        v.scope_type == "subscription" ? can(regex("(?i)^/subscriptions/[^/]+$", v.scope)) :
+        v.scope_type == "resource_group" ? can(regex("(?i)^/subscriptions/[^/]+/resourceGroups/[^/]+$", v.scope)) :
+        (
+          can(regex("(?i)^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/[^/]+/.+[^/]$", v.scope)) ||
+          can(regex("(?i)^/subscriptions/[^/]+/providers/[^/]+/.+[^/]$", v.scope))
+        )
       )
     ])
-    error_message = "Each scope must be a management group, subscription, resource group or resource ID. Resources directly under a management group are not supported."
+    error_message = "Each scope must be an ID of the type set in scope_type. Resources directly under a management group are not supported."
   }
 
   validation {
@@ -56,7 +67,7 @@ variable "policy_exemptions" {
   validation {
     condition = alltrue([
       for k, v in var.policy_exemptions :
-      v.expires_on == null || can(timecmp(v.expires_on, "2000-01-01T00:00:00Z"))
+      can(timecmp(v.expires_on, "2000-01-01T00:00:00Z"))
     ])
     error_message = "Each expires_on must be an RFC 3339 timestamp, for example 2027-03-31T23:59:59Z."
   }
