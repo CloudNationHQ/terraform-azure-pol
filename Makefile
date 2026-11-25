@@ -28,6 +28,8 @@ test-unit:
 	fi
 	terraform init -backend=false
 	terraform test $(if $(file),-filter=$(file)) $(if $(verbose),-verbose)
+	@echo "Cleaning up initialization files..."
+	rm -rf .terraform terraform.tfstate terraform.tfstate.backup .terraform.lock.hcl
 
 docs:
 	@echo "Generating documentation for root and modules..."
