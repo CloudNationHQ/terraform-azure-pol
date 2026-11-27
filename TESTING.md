@@ -2,6 +2,16 @@
 
 Ensure Go and Terraform are installed.
 
+### Unit Testing
+
+Run the unit tests (`*.tftest.hcl` in the repository root). They use a mock azurerm provider, so they need no Azure access.
+
+`make test-unit`
+
+Run a single test file
+
+`make test-unit file=policy_exemptions.tftest.hcl`
+
 ### Individual Module Testing
 
 Test specific examples from the `examples/` directory:
